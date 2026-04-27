@@ -1,0 +1,120 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  phone     String?
+  avatar    String?
+  role      Role     @default(TENANT)
+  bio       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  properties       Property[]       @relation("LandlordProperties")
+  bookingRequests  BookingRequest[] @relation("TenantBookings")
+  reviews          Review[]         @relation("TenantReviews")
+  sentMessages     Message[]        @relation("SentMessages")
+  receivedMessages Message[]        @relation("ReceivedMessages")
+}
+
+model Property {
+  id          String         @id @default(cuid())
+  landlordId  String
+  title       String
+  description String
+  address     String
+  suburb      String
+  city        String
+  latitude    Float
+  longitude   Float
+  bedrooms    Int
+  bathrooms   Int
+  price       Float
+  images      String         @default("[]")
+  amenities   String         @default("[]")
+  status      PropertyStatus @default(AVAILABLE)
+  type        PropertyType   @default(APARTMENT)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  landlord        User             @relation("LandlordProperties", fields: [landlordId], references: [id])
+  bookingRequests BookingRequest[]
+  reviews         Review[]
+  messages        Message[]
+}
+
+model BookingRequest {
+  id         String        @id @default(cuid())
+  tenantId   String
+  propertyId String
+  status     BookingStatus @default(PENDING)
+  message    String?
+  moveInDate DateTime?
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  tenant   User     @relation("TenantBookings", fields: [tenantId], references: [id])
+  property Property @relation(fields: [propertyId], references: [id])
+}
+
+model Review {
+  id         String   @id @default(cuid())
+  tenantId   String
+  propertyId String
+  rating     Int
+  comment    String
+  createdAt  DateTime @default(now())
+
+  tenant   User     @relation("TenantReviews", fields: [tenantId], references: [id])
+  property Property @relation(fields: [propertyId], references: [id])
+}
+
+model Message {
+  id         String   @id @default(cuid())
+  senderId   String
+  receiverId String
+  propertyId String?
+  content    String
+  read       Boolean  @default(false)
+  createdAt  DateTime @default(now())
+
+  sender   User      @relation("SentMessages", fields: [senderId], references: [id])
+  receiver User      @relation("ReceivedMessages", fields: [receiverId], references: [id])
+  property Property? @relation(fields: [propertyId], references: [id])
+}
+
+enum Role {
+  TENANT
+  LANDLORD
+  ADMIN
+}
+
+enum PropertyStatus {
+  AVAILABLE
+  PENDING
+  RENTED
+}
+
+enum PropertyType {
+  APARTMENT
+  HOUSE
+  TOWNHOUSE
+  STUDIO
+  ROOM
+}
+
+enum BookingStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  COMPLETED
+  CANCELLED
+}
