@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
       amenities: JSON.parse(p.amenities),
       avgRating:
         p.reviews.length > 0
-          ? p.reviews.reduce((sum, r) => sum + r.rating, 0) / p.reviews.length
+          ? p.reviews.reduce((sum: number, r) => sum + r.rating, 0) / p.reviews.length
           : null,
     }));
 

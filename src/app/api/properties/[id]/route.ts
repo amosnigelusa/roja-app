@@ -27,7 +27,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       amenities: JSON.parse(property.amenities),
       avgRating:
         property.reviews.length > 0
-          ? property.reviews.reduce((sum, r) => sum + r.rating, 0) / property.reviews.length
+          ? property.reviews.reduce((sum: number, r) => sum + r.rating, 0) / property.reviews.length
           : null,
     });
   } catch {

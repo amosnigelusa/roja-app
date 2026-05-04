@@ -29,7 +29,7 @@ export default function LandlordDashboard() {
   const availableCount = properties.filter((p) => p.status === "AVAILABLE").length;
   const totalEarnings = properties
     .filter((p) => p.status === "RENTED")
-    .reduce((sum, p) => sum + p.price, 0);
+    .reduce((sum: number, p) => sum + p.price, 0);
 
   return (
     <div className="min-h-screen bg-gray-50">
